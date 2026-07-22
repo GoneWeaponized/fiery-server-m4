@@ -1,0 +1,30 @@
+[
+  {
+    "owner": "f1a52f93-76c5-4f52-ac8e-7475dcbe127c",
+    "resources": {
+      "money": 77342,
+      "manpower": 3783
+    }
+  },
+  {
+    "owner": "f28fb523-a082-4184-9591-be4959c939b2",
+    "resources": {
+      "money": 405000,
+      "manpower": 50000
+    }
+  },
+  {
+    "owner": "0c7dc9aa-d6f1-4693-9e49-afbd6acdc368",
+    "resources": {
+      "money": 40000,
+      "manpower": 50000
+    }
+  },
+  {
+    "owner": "43bfac04-ea4a-4605-88d5-de05f9c7a469",
+    "resources": {
+      "money": 40000,
+      "manpower": 50000
+    }
+  }
+]

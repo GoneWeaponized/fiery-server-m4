@@ -1,0 +1,20 @@
+{
+  "name": "Fierym4",
+  "version": "1.0.4",
+  "description": "NodeJS server for FieryEscalation",
+  "main": "server.js",
+  "gypfile": true,
+  "dependencies": {
+    "nan": "^2.3.3",
+    "node-addon-api": "^8.9.0"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "install": "node-gyp rebuild",
+    "start": "node server.js"
+  },
+  "author": "@GoneWeaponized - Discord: Weaponzied_vozhd",
+  "license": "UNLICENSED",
+  "devDependencies": {},
+  "keywords": []
+}

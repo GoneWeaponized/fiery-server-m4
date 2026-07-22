@@ -1,0 +1,42 @@
+[
+  {
+    "uuid": "f28fb523-a082-4184-9591-be4959c939b2",
+    "username": "bigMan",
+    "subId": "k9R2vL5xW8qP3bM1",
+    "entity": {
+      "type": "player",
+      "lat": 26.224139556929472,
+      "lng": 78.2232615114267
+    }
+  },
+  {
+    "uuid": "f1a52f93-76c5-4f52-ac8e-7475dcbe127c",
+    "username": "bathtub",
+    "subId": "401436d886d983ff",
+    "entity": {
+      "type": "player",
+      "lat": 26.2198735,
+      "lng": 78.2231205
+    }
+  },
+  {
+    "uuid": "0c7dc9aa-d6f1-4693-9e49-afbd6acdc368",
+    "username": "Lolmantrollman",
+    "subId": "c562e3dc6bf9d23a",
+    "entity": {
+      "type": "player",
+      "lat": 34.634234,
+      "lng": 82.93432
+    }
+  },
+  {
+    "uuid": "43bfac04-ea4a-4605-88d5-de05f9c7a469",
+    "username": "plasticfoods",
+    "subId": "8600a9354dbd6d8e",
+    "entity": {
+      "type": "player",
+      "lat": 26.2199196,
+      "lng": 78.2231826
+    }
+  }
+]
