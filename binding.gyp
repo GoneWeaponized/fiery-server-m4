@@ -2,7 +2,7 @@
   "targets": [
     {
       "target_name": "addon-cpp",
-      "sources": [ "./addon-cpp/hello.cc" ],
+      "sources": [ "./addon-cpp/math/use.cpp" ],
       "include_dirs": [
         "<!@(node -p \"require('node-addon-api').include\")"
       ],

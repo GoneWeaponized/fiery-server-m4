@@ -1,5 +1,6 @@
 const COSTS = Object.freeze({
     BASE: 30000,
+    OVERLORD: 5000,
     SAMSITE: 10000,
     CIWS: 5000,
     ARTILLERY: 5000,

@@ -1,0 +1,32 @@
+[
+  {
+    "owner": "f1a52f93-76c5-4f52-ac8e-7475dcbe127c",
+    "type": 1,
+    "position": {
+      "lat": 26.224139556929472,
+      "long": 78.2232615114267
+    },
+    "data": {
+      "hp": 3000,
+      "subId": "br6ajg8bqml04hdf",
+      "hasInventory": false,
+      "isOnline": false,
+      "bootTime": 1800000
+    }
+  },
+  {
+    "owner": "f1a52f93-76c5-4f52-ac8e-7475dcbe127c",
+    "type": 0,
+    "position": {
+      "lat": 26.2198735,
+      "long": 78.2231205
+    },
+    "data": {
+      "hp": 3000,
+      "subId": "5bd2dbfd6139b20a",
+      "hasInventory": true,
+      "isOnline": false,
+      "bootTime": 1800000
+    }
+  }
+]

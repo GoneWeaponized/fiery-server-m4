@@ -7,7 +7,7 @@ function requests(uuid, request, lat, long, socket) {
 
     const reqId = parseInt(request, 10);
     if (isNaN(reqId) || reqId < 0 || reqId >= COST_LOOKUP.length) {
-        socket.write([0x06]);
+        socket.write(Buffer.from([0x06]));
         console.log(`[ERROR] Invalid request ID received: ${requestId}`);
         return;
     }

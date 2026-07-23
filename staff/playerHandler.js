@@ -122,4 +122,4 @@ function playerInfo(username) {
 }
 
 
-module.exports = { getPlayersClient, updateOldPlayer, listPlayers, findPlayerByName, playerInfo, addPlayer, savePlayers }
+module.exports = { getPlayersClient, updateOldPlayer, listPlayers, findPlayerByName, playerInfo, addPlayer, savePlayers, findPlayerByUUID }

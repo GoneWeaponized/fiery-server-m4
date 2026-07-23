@@ -4,6 +4,10 @@ class Base {
         this.lat = lat;
         this.long = long;
         this.owner = owner;
+        this.Hp = 3000;
+        this.HasInv = true;
+        this.invCap = 50000;
+        this.online = false;
     }
 }
 class Overlord {
@@ -12,6 +16,10 @@ class Overlord {
         this.lat = lat;
         this.long = long;
         this.owner = owner;
+        this.Hp = 3000;
+        this.HasInv = true;
+        this.invCap = 500000;
+        this.online = false;
     }
 }
 class SAMsite {
@@ -19,7 +27,15 @@ class SAMsite {
     constructor(lat, long, owner) {
         this.lat = lat;
         this.long = long;
-        this.owner = owner;}
+        this.owner = owner;
+        this.lat = lat;
+        this.long = long;
+        this.owner = owner;
+        this.Hp = 3000;
+        this.HasInv = true;
+        this.invCap = 500000;
+        this.online = false;
+    }
 }
 class CIWS {
     static TYPE = 3;

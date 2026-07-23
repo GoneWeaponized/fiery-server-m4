@@ -2,8 +2,9 @@ const { Buffer } = require('node:buffer');
 const { getPlayersClient, updateOldPlayer, purchaseEvent } = require('./playerHandler');
 const resourceRequests = require('./client-parser/resourceRequests');
 const playerRequests = require('./client-parser/playerRequests');
+const buildRequest =  require('./client-parser/buildRequest')
 const { createPlayer } = require('./registration');
-const construct = require('./building');
+const construct = require('./buildingHandler');
 module.exports = function (socket, pakket) {
 
 	const lengthHeader = pakket.readUInt16BE(0);
@@ -20,6 +21,8 @@ module.exports = function (socket, pakket) {
 			playerRequests.updateLoc(socket, pakket);
 			break;
 		}
+		//case 2 is reserved for something else.
+		case 3: buildRequest.makeStructureEntry(socket, pakket); break;
 
 		case 4: resourceRequests.getPlayerResources(socket, pakket); break;
 
