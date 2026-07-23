@@ -2,7 +2,10 @@
   "targets": [
     {
       "target_name": "addon-cpp",
-      "sources": [ "./addon-cpp/math/use.cpp" ],
+      "sources": [
+      "./addon-cpp/math/distance.cpp" ,
+      "./addon-cpp/math/haversine.cpp"
+      ],
       "include_dirs": [
         "<!@(node -p \"require('node-addon-api').include\")"
       ],
