@@ -11,5 +11,6 @@ function randomRadius(min, max){
 
 module.exports = {
     randomLatitude,
-    randomLongitude
+    randomLongitude,
+    randomRadius
 };
