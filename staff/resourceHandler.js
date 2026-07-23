@@ -1,6 +1,7 @@
 const fs = require('fs');
 const { Buffer } = require('node:buffer');
 const path = require("path");
+const costs = require("../constants/costs");
 
 const RESOURCES_FILE = path.join(__dirname,"../data/resources.json");
 
@@ -36,10 +37,41 @@ function addResourceOwner(resourceOwner, uuid) {
     saveResources();
     console.log("ADDED: Resource Owner for uuid: ", uuid);
 }
+function deductResource(uuid, costIndex){
+    const resourceOwner = findResourceByUUID(uuid);
+
+    if(!resourceOwner){
+        console.log(`Resource owner not found for UUID ${uuid}`);
+        return false;
+    }
+
+    const cost = cost.COST_LOOKUP(costIndex);
+
+    if(cost === undefined) {
+        console.log(`Invalid Cost Index :${costIndex}`);
+        return false;
+    }
+    if(resourceOwner.resources.money < cost){
+        console.log(`${uuid} does not have enough money.`);
+        return false;
+    }
+    resourceOwner.resources.money -= cost;
+
+    saveResources();
+    console.log(`${uuid} spent $${cost}. to build a structure.`);
+
+    return true;
+}
+
 // Client functions have been set in ./client-parse/resourceRequester.js
 
 // ============== CLI STUFF =======================
 console.log("\nRESOLVED RESOURCES FILE PATH:", fs.realpathSync(RESOURCES_FILE));
 if (resources.length > 0) { console.log("Resources loaded!\n");}
 
-module.exports = { saveResources, findResourceByUUID, makeResEntry };
+module.exports = { 
+    saveResources,
+    findResourceByUUID, 
+    makeResEntry,
+    deductResource
+ };
