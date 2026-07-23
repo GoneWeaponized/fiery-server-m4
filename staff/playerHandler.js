@@ -1,6 +1,17 @@
 const fs = require('fs');
 const { Buffer } = require('node:buffer');
 const path = require("path");
+const connectedClients = new Map();
+
+
+function registerSocket(uuid, socket) {
+    connectedClients.set(uuid, socket);
+}
+
+function unregisterSocket(uuid) {
+    connectedClients.delete(uuid);
+}
+
 
 const PLAYERS_FILE = path.join(__dirname,"../data/players.json");
 
@@ -121,5 +132,69 @@ function playerInfo(username) {
 	}
 }
 
+function broadcast(packet) {
 
-module.exports = { getPlayersClient, updateOldPlayer, listPlayers, findPlayerByName, playerInfo, addPlayer, savePlayers }
+    for (const socket of connectedClients.values()) {
+        socket.write(packet);
+    }
+}
+
+function sendAmbientEvent(event) {
+
+    const message = Buffer.from(event.message, "utf8");
+
+    const packetSize = 38 + message.length;
+
+    const packet = Buffer.alloc(packetSize);
+
+    let offset = 0;
+
+    packet.writeUInt16BE(packetSize, offset);
+    offset += 2;
+
+    packet.writeUInt8(event.typeId, offset);
+	offset += 1;
+
+    packet.writeUInt8(event.id, offset);
+    offset++;
+
+	packet.writeUInt32BE(event.instanceId, offset);
+	offset += 4;
+
+    packet.writeDoubleBE(event.lat, offset);
+    offset += 8;
+
+    packet.writeDoubleBE(event.lng, offset);
+    offset += 8;
+
+    packet.writeUInt32BE(event.radius, offset);
+    offset += 4;
+
+    packet.writeUInt32BE(event.reward, offset);
+    offset += 4;
+
+    packet.writeUInt32BE(event.duration, offset);
+    offset += 4;
+
+    packet.writeUInt16BE(message.length, offset);
+    offset += 2;
+
+    message.copy(packet, offset);
+
+    broadcast(packet);
+
+}
+module.exports = {
+	getPlayersClient,
+	updateOldPlayer,
+	listPlayers,
+	findPlayerByName,
+	playerInfo,
+	addPlayer,
+	savePlayers,
+
+	registerSocket,
+    unregisterSocket,
+    broadcast,
+    sendAmbientEvent
+};
