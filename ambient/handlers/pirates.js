@@ -1,4 +1,4 @@
-const randomLocation = require("../util/randomLocation");
+const randomLocation = require("../../util/randomLocation");
 
 module.exports = function () {
 
