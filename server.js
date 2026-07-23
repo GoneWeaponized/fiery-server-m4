@@ -2,6 +2,8 @@ const net = require('net');
 const readline = require('readline');
 const krakey = require("./staff/krakey");  // Krakey is a parser caller
 const playerHandler = require("./staff/playerHandler"); 
+const spawnEvent = require('./ambient/spawnEvent'); //Ambient Event Spawning
+const { spawn } = require('child_process');
 
 const PORT = 5010;
 const MAX_LENGTH = 65536;
@@ -69,6 +71,11 @@ rl.on("line", line => {
             }
         }
     });
+
+    //interval for ambient event
+setInterval(()=>{
+    spawnEvent();
+}, 200000);
 
 
 server.listen(PORT, () =>{
