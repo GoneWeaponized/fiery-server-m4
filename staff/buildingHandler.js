@@ -3,9 +3,8 @@ const path = require("path");
 const resourceHandler = require('./resourceHandler');
 const fs = require('fs');
 const STRUCTURES_FILE = path.join(__dirname,"../data/structures.json");
-const { Base, Overlord, SAMsite } = require('../classes/buildables');
 const crypto = require("crypto");
-const { COST_LOOKUP } = require('../constants/costs');
+const { BUILDABLES, BUILDABLES_BY_ID } = require("../classes/buildableTypes");
 
 let structures = [];
 
@@ -17,45 +16,59 @@ function saveStructures(){
     fs.writeFileSync(STRUCTURES_FILE,JSON.stringify(structures,null,2));
 }
 
-function construct(socket, lat, long, typeStructure, uuid) {
-    // this thing only constructs. The request is validated by buildingRequest
-    const owner = uuid;
-    switch(typeStructure) {
-        case Base.TYPE: const newBase = new Base(lat, long, owner); addBuilding(socket, uuid, newBase, Base.TYPE); break;
-        case Overlord.TYPE: const newOv = new Overlord(lat, long, owner); addBuilding(uuid, newOv, Overlord.TYPE); break; // admin only lmao
+function construct(socket, lat, long, typeId, uuid) {
+
+    const buildable = BUILDABLES_BY_ID[typeId];
+
+    if (!buildable) {
+        console.log(`Unknown buildable type: ${typeId}`);
+        return false;
     }
 
+    if (!validateRequest(socket, uuid, buildable.cost)) {
+        return false;
+    }
+
+    const building = new buildable.class(lat, long, uuid);
+
+    addBuilding(building, buildable);
+
+    return true;
 }
 
 function addStructure(structure, uuid){
     structures.push(structure);
-    saveStructures();
     console.log(structure + " -> Has been added.");
 }
 
-function validateRequest(socket, uuid, type) {
+function validateRequest(socket, uuid, cost) {
+
     const error = Buffer.alloc(3);
+
     error.writeUInt16BE(3,0);
     error.writeUInt8(18,2);
-    const res = resourceHandler.findResourceByUUID(uuid);
-    if(res.resources.money < COST_LOOKUP[type]) {
+
+    if (!resourceHandler.deductResource(uuid, cost)) {
+
         console.log("Low Money, build request denied.");
+
         socket.write(error);
+
         return false;
     }
-    res.resources.money -= COST_LOOKUP[type];
-    resourceHandler.saveResources();
+
     return true;
 }
 
-function addBuilding(socket, uuid, building, type) {
-    if (!validateRequest(socket, uuid, type)) {
+function addBuilding(socket, uuid, building, buildable) {
+    if (!validateRequest(socket, uuid, buildable.cost)) {
         return;
     }
     const subId = crypto.randomBytes(8).toString('hex');
-    structure = {
+    const structure = {
         owner: building.owner,
-        type: type,
+        type: buildable.typeId,
+        name: buildable.name,
         position: {
             lat: building.lat,
             long: building.long
@@ -68,7 +81,7 @@ function addBuilding(socket, uuid, building, type) {
             bootTime: 1800000 // same for all
         }
     }
-    addStructure(structure)
+    addStructure(structure);
     saveStructures();
 }
 module.exports = {

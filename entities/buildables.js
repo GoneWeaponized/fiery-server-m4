@@ -28,9 +28,6 @@ class SAMsite {
         this.lat = lat;
         this.long = long;
         this.owner = owner;
-        this.lat = lat;
-        this.long = long;
-        this.owner = owner;
         this.Hp = 3000;
         this.HasInv = true;
         this.invCap = 500000;

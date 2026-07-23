@@ -37,28 +37,25 @@ function addResourceOwner(resourceOwner, uuid) {
     saveResources();
     console.log("ADDED: Resource Owner for uuid: ", uuid);
 }
-function deductResource(uuid, costIndex){
+function deductResource(uuid, amount) {
+
     const resourceOwner = findResourceByUUID(uuid);
 
-    if(!resourceOwner){
+    if (!resourceOwner) {
         console.log(`Resource owner not found for UUID ${uuid}`);
         return false;
     }
 
-    const cost = cost.COST_LOOKUP(costIndex);
-
-    if(cost === undefined) {
-        console.log(`Invalid Cost Index :${costIndex}`);
-        return false;
-    }
-    if(resourceOwner.resources.money < cost){
+    if (resourceOwner.resources.money < amount) {
         console.log(`${uuid} does not have enough money.`);
         return false;
     }
-    resourceOwner.resources.money -= cost;
+
+    resourceOwner.resources.money -= amount;
 
     saveResources();
-    console.log(`${uuid} spent $${cost}. to build a structure.`);
+
+    console.log(`${uuid} spent $${amount}.`);
 
     return true;
 }
