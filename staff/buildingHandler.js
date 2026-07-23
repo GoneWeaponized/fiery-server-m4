@@ -78,7 +78,8 @@ function addBuilding(socket, uuid, building, buildable) {
             subId: subId,
             hasInventory: building.HasInv,
             isOnline: building.online,
-            bootTime: 1800000 // same for all
+            bootTime: 1800000, // same for all
+            bootStarted: Date.now()
         }
     }
     addStructure(structure);
