@@ -2,19 +2,42 @@ const krakey = require('./krakey');
 const path = require("path");
 const resourceHandler = require('./resourceHandler');
 const fs = require('fs');
-const STRUCTURES_FILE = path.join(__dirname,"../data/structures.json");
+const STRUCTURES_FILE = path.join(__dirname, "../data/structures.json");
 const crypto = require("crypto");
-const { BUILDABLES, BUILDABLES_BY_ID } = require("../classes/buildableTypes");
+const { BUILDABLES_BY_ID } = require("../classes/buildableTypes");
+const RBush = require('rbush').default;
+const { findDistance } = require("../util/distanceCalc");
+
+// Now it works as a constructor
+const tree = new RBush(16);
+
 
 let structures = [];
 
-if (fs.existsSync(STRUCTURES_FILE)){
-    structures = JSON.parse(fs.readFileSync(STRUCTURES_FILE,"utf8"));
+if (fs.existsSync(STRUCTURES_FILE)) {
+    structures = JSON.parse(fs.readFileSync(STRUCTURES_FILE, "utf8"));
 }
 
-function saveStructures(){
-    fs.writeFileSync(STRUCTURES_FILE,JSON.stringify(structures,null,2));
+function saveStructures() {
+    fs.writeFileSync(STRUCTURES_FILE, JSON.stringify(structures, null, 2));
 }
+function sendInvalidDistance(socket) {
+    let buf = Buffer.alloc(3);
+    buf.writeUInt16BE(2,0);
+    buf.writeUInt8(18,2);
+    socket.write(buf);
+}
+console.log("buildingHandler: loading structures in tree.");
+const formattedItems = structures.map(item => (
+    {
+        minX: item.position.long,
+        minY: item.position.lat,
+        maxX: item.position.long,
+        maxY: item.position.lat,
+        id: item.data.subId
+    }));
+tree.load(formattedItems);
+console.log(`buildingHandler: Loaded ${tree.all().length} structures in tree`);
 
 function construct(socket, lat, long, typeId, uuid) {
 
@@ -24,7 +47,12 @@ function construct(socket, lat, long, typeId, uuid) {
         console.log(`Unknown buildable type: ${typeId}`);
         return false;
     }
-
+    if(!placementValidate(lat, long)) {
+        console.log("Build request denied for ", uuid);
+        sendInvalidDistance(socket);
+        return false;
+    }
+    // Validate and deduct the player's resources once.
     if (!validateRequest(socket, uuid, buildable.cost)) {
         return false;
     }
@@ -36,17 +64,17 @@ function construct(socket, lat, long, typeId, uuid) {
     return true;
 }
 
-function addStructure(structure, uuid){
+function addStructure(structure) {
     structures.push(structure);
-    console.log(structure + " -> Has been added.");
+    console.log(`${structure.name} -> Has been added.`);
 }
 
 function validateRequest(socket, uuid, cost) {
 
     const error = Buffer.alloc(3);
 
-    error.writeUInt16BE(3,0);
-    error.writeUInt8(18,2);
+    error.writeUInt16BE(3, 0);
+    error.writeUInt8(18, 2);
 
     if (!resourceHandler.deductResource(uuid, cost)) {
 
@@ -60,11 +88,10 @@ function validateRequest(socket, uuid, cost) {
     return true;
 }
 
-function addBuilding(socket, uuid, building, buildable) {
-    if (!validateRequest(socket, uuid, buildable.cost)) {
-        return;
-    }
+function addBuilding(building, buildable) {
+
     const subId = crypto.randomBytes(8).toString('hex');
+
     const structure = {
         owner: building.owner,
         type: buildable.typeId,
@@ -75,18 +102,47 @@ function addBuilding(socket, uuid, building, buildable) {
         },
         data: {
             hp: building.Hp,
-            subId: subId,
+            subId,
             hasInventory: building.HasInv,
             isOnline: building.online,
-            bootTime: 1800000, // same for all
+            bootTime: 1800000,
             bootStarted: Date.now()
         }
-    }
+    };
+
     addStructure(structure);
     saveStructures();
 }
+
+function placementValidate(lat, long) {
+    const rad = 0.001;
+    // call this function before calling add structure
+    const searchBox = {
+        minX: long - rad,
+        minY: lat - rad,
+        maxX: long + rad,
+        maxY: lat + rad
+    };
+    const results = tree.search(searchBox);
+    if (results.length > 0) {
+        results.forEach(item => {
+            console.log(`Found ID: ${item.id} at Latitude: ${item.maxY}, Longitude: ${item.maxX}`);
+            if(findDistance([lat,long,item.maxY,item.maxX]) < 0.1) {
+                return false;
+            }
+        });
+        return true;
+    } else {
+        console.log("No locations found nearby.");
+        return true;
+    }
+}
+
 module.exports = {
-    addBuilding, construct, saveStructures
+    addBuilding,
+    construct,
+    saveStructures
 };
-// A structure inventory file will be created separately for structures that do have a inventory
+
+// A structure inventory file will be created separately for structures that do have an inventory.
 // Running outta time bruh

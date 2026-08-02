@@ -21,8 +21,8 @@ client.connect(PORT, HOST, () => {
 client.on('data', (data) => {
     console.log('[TEST] Received response buffer from server:', data);
 
-    if (data.length === 3 && data[2] === 0x06) {
-        console.log('[TEST] Result: Player/Resources NOT FOUND (Error code 0x06 received).');
+    if (data.length === 3 && data[2] === 0x18) {
+        console.log('[TEST] Result: Invalid distance (Error code 0x18 received).');
         client.destroy();
         return;
     }

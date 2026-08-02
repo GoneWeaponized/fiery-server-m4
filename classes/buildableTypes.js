@@ -56,7 +56,7 @@ const BUILDABLES = {
 
 const BUILDABLES_BY_ID = {};
 
-for (const buildable of Object.values(module.exports)) {
+for (const buildable of Object.values(BUILDABLES)) {
     BUILDABLES_BY_ID[buildable.typeId] = buildable;
 }
 

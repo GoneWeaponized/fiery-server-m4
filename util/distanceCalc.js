@@ -1,7 +1,8 @@
-const distCalc = require('../build/release/addon-cpp');
+const distCalc = require("../build/Release/addon-cpp");
 
 function findDistance(coordArray) {
-    console.log(distCalc.getDistance(distances));
+    console.log(distCalc.getDistance(coordArray));
+    return distCalc.getDistance(coordArray);
 }
 
 module.exports = { findDistance };
