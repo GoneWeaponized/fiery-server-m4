@@ -8,6 +8,7 @@ class Base {
         this.HasInv = true;
         this.invCap = 50000;
         this.online = false;
+        //this.cost = 30000;
     }
 }
 class Overlord {

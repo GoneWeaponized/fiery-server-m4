@@ -15,6 +15,23 @@ if (fs.existsSync(STRUCTURES_FILE)) {
 function saveStructures() {
     fs.writeFileSync(STRUCTURES_FILE, JSON.stringify(structures, null, 2));
 }
+function sendInvalidDistance(socket) {
+    let buf = Buffer.alloc(3);
+    buf.writeUInt16BE(2,0);
+    buf.writeUInt8(18,2);
+    socket.write(buf);
+}
+console.log("buildingHandler: loading structures in tree.");
+const formattedItems = structures.map(item => (
+    {
+        minX: item.position.long,
+        minY: item.position.lat,
+        maxX: item.position.long,
+        maxY: item.position.lat,
+        id: item.data.subId
+    }));
+tree.load(formattedItems);
+console.log(`buildingHandler: Loaded ${tree.all().length} structures in tree`);
 
 function construct(socket, lat, long, typeId, uuid) {
 
@@ -24,7 +41,6 @@ function construct(socket, lat, long, typeId, uuid) {
         console.log(`Unknown buildable type: ${typeId}`);
         return false;
     }
-
     // Validate and deduct the player's resources once.
     if (!validateRequest(socket, uuid, buildable.cost)) {
         return false;

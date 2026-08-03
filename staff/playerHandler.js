@@ -192,7 +192,7 @@ module.exports = {
 	playerInfo,
 	addPlayer,
 	savePlayers,
-
+	findPlayerByUUID,
 	registerSocket,
     unregisterSocket,
     broadcast,

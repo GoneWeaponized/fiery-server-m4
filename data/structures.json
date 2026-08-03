@@ -1,32 +1,36 @@
 [
   {
     "owner": "f1a52f93-76c5-4f52-ac8e-7475dcbe127c",
-    "type": 1,
-    "position": {
-      "lat": 26.224139556929472,
-      "long": 78.2232615114267
-    },
-    "data": {
-      "hp": 3000,
-      "subId": "br6ajg8bqml04hdf",
-      "hasInventory": false,
-      "isOnline": false,
-      "bootTime": 1800000
-    }
-  },
-  {
-    "owner": "f1a52f93-76c5-4f52-ac8e-7475dcbe127c",
     "type": 0,
+    "name": "Base",
     "position": {
       "lat": 26.2198735,
       "long": 78.2231205
     },
     "data": {
       "hp": 3000,
-      "subId": "5bd2dbfd6139b20a",
+      "subId": "c919095b0a08664a",
       "hasInventory": true,
       "isOnline": false,
-      "bootTime": 1800000
+      "bootTime": 1800000,
+      "bootStarted": 1785587154914
+    }
+  },
+  {
+    "owner": "f1a52f93-76c5-4f52-ac8e-7475dcbe127c",
+    "type": 0,
+    "name": "Base",
+    "position": {
+      "lat": 26.2188735,
+      "long": 78.2231205
+    },
+    "data": {
+      "hp": 3000,
+      "subId": "b656061263cd1536",
+      "hasInventory": true,
+      "isOnline": false,
+      "bootTime": 1800000,
+      "bootStarted": 1785660830196
     }
   }
 ]
