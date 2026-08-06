@@ -39,6 +39,6 @@ function updateLoc(socket, pakket) {
     );
 
     playerHandler.updateOldPlayer(lat, long, uuid);
-    playerHandler.getPlayersClient(socket); // Hey rui can you add some loop that sends this typa data when a guy updates location once. Sends until player disonnects
+    playerHandler.getPlayersClient(socket, uuid); // Hey rui can you add some loop that sends this typa data when a guy updates location once. Sends until player disonnects
 }
 module.exports = {makePlayerEntry, updateLoc};

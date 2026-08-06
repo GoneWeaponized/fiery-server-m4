@@ -1,7 +1,8 @@
 const net = require('net');
 const readline = require('readline');
 const krakey = require("./staff/krakey");  // Krakey is a parser caller
-const playerHandler = require("./staff/playerHandler"); 
+const playerHandler = require("./staff/playerHandler");
+const buildHandler = require("./staff/buildingHandler");
 const {spawnEvent} = require('./ambient/spawnEvent'); //Ambient Event Spawning
 const { spawn } = require('child_process');
 
@@ -46,7 +47,12 @@ rl.on("line", line => {
 
     switch (line) {
         case ("" || " "): break;
-        case "quit" : console.log("\n\nClosing the server."); playerHandler.savePlayers(); console.log("Quitting."); process.exit(); break;
+        case "quit" : console.log("\n\nClosing the server.");
+        buildHandler.saveStructures();
+        playerHandler.savePlayers();
+        console.log("Quitting.");
+        process.exit();
+        break;
         case "list players":
             playerHandler.listPlayers();
             break;

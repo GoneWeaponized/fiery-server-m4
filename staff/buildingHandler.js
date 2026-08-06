@@ -66,7 +66,23 @@ function construct(socket, lat, long, typeId, uuid) {
 
 function addStructure(structure) {
     structures.push(structure);
+    const formattedItem = {
+        minX: structure.position.long,
+        minY: structure.position.lat,
+        maxX: structure.position.long,
+        maxY: structure.position.lat,
+    };
+    tree.insert(formattedItem);
     console.log(`${structure.name} -> Has been added.`);
+}
+
+function removeStructure(id) {
+    const targetId = structures.findIndex(structure => structure.data.subId === id);
+    if (targetId !== -1) {
+        structures.splice(targetId, 1);
+        console.log(`Removed ${id} from the structures array. Will take effect on quitting.`);
+        tree.remove({ id: id }, (a, b) => a.id === b.id);
+    }
 }
 
 function validateRequest(socket, uuid, cost) {
@@ -115,8 +131,8 @@ function addBuilding(building, buildable) {
 }
 
 function placementValidate(lat, long) {
-    const rad = 0.001;
-    // call this function before calling add structure
+    const rad = 0.001; //100 meters
+    // Rui, we can use it for much more than just structure placement lol
     const searchBox = {
         minX: long - rad,
         minY: lat - rad,
@@ -141,8 +157,8 @@ function placementValidate(lat, long) {
 module.exports = {
     addBuilding,
     construct,
-    saveStructures
+    saveStructures,
+    removeStructure
 };
 
 // A structure inventory file will be created separately for structures that do have an inventory.
-// Running outta time bruh

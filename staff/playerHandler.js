@@ -46,18 +46,18 @@ function addPlayer(player, uuid){
 
 // ========================================== PLAYER EVENTS ===================================================
 
-function purchaseEvent(socket, lat, long, request, uuid) {
-	const requester = findPlayerByUUID(uuid);
-	if (!requester) {
-		console.log("requester not found for " + uuid)
-		return;
-	}
-	const player = findPlayerByUUID(uuid);
-
-	if(!player) return;
-
-	validateReq(uuid, request, lat, long, socket);
-}
+// function purchaseEvent(socket, lat, long, request, uuid) {
+// 	const requester = findPlayerByUUID(uuid);
+// 	if (!requester) {
+// 		console.log("requester not found for " + uuid)
+// 		return;
+// 	}
+// 	const player = findPlayerByUUID(uuid);
+//
+// 	if(!player) return;
+//
+// 	validateReq(uuid, request, lat, long, socket);
+// }
 
 function updateOldPlayer(lat, long ,uuid) {
 	const requester = findPlayerByUUID(uuid);
@@ -73,18 +73,32 @@ function updateOldPlayer(lat, long ,uuid) {
 	player.entity.lng = long;
 
 	savePlayers();
-	//console.log("[CLIENT UPDATE PLAYER REQUEST] Player: \"" + player.username + "\" subID: \"" + player.subId + "\" - updated successfully.");
 }
 // =============== FUNCTIONS THAT SEND TO CLIENT =====================
 
-function getPlayersClient(socket) {
+function getMyData(socket, uuid) {
+	let me = findPlayerByUUID("f28fb523-a082-4184-9591-be4959c939b2");
+	let buffer = Buffer.alloc(19);
+	let offset = 0;
+	buffer.writeUInt16BE(buffer.length, offset);
+	offset += 2;
+	buffer.writeUInt8(13, offset);
+	offset +=1;
+	buffer.write(me.subId, offset, 16);
+	let a = buffer.toString('utf8', offset, offset + 16);
+	console.log(a);
+}
+function getPlayersClient(socket, tuuid) {
 	for (const player of players) {
 
 		const lat = parseFloat(player.entity.lat);
 		const lng = parseFloat(player.entity.lng);
 
 		const nameBuf = Buffer.from(player.username, 'utf8');
-		const subIdBuf = Buffer.from(player.subId, 'utf8'); //always 16 characters long.
+
+		const isMatch = (player.uuid === tuuid);
+		const idString = isMatch ? tuuid.substring(0, 16) : player.subId;
+		const subIdBuf = Buffer.from(idString, 'utf8');
 
 		const packetSize = 37 + nameBuf.length;
 		const temp = Buffer.alloc(packetSize);
@@ -94,7 +108,7 @@ function getPlayersClient(socket) {
 		temp.writeDoubleBE(lat, 3);
 		temp.writeDoubleBE(lng, 11);
 
-		temp.write(player.subId, 19, 16, 'utf8');
+		temp.write(idString, 19, 16, 'utf8');
 
 		temp.writeUInt16BE(nameBuf.length, 35); // Name Length
 		nameBuf.copy(temp, 37);                 // Name Content
@@ -184,6 +198,7 @@ function sendAmbientEvent(event) {
     broadcast(packet);
 
 }
+
 module.exports = {
 	getPlayersClient,
 	updateOldPlayer,
@@ -196,6 +211,7 @@ module.exports = {
 	registerSocket,
     unregisterSocket,
     broadcast,
-    sendAmbientEvent
+    sendAmbientEvent,
+	getMyData
 };
 
