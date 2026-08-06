@@ -6,18 +6,11 @@ const STRUCTURES_FILE = path.join(__dirname, "../data/structures.json");
 const crypto = require("crypto");
 const { BUILDABLES_BY_ID } = require("../classes/buildableTypes");
 const RBush = require('rbush').default;
-const { findDistance } = require("../util/distanceCalc");
-
-// Now it works as a constructor
-const tree = new RBush(16);
-
-
 let structures = [];
-
+const tree = new RBush(16);
 if (fs.existsSync(STRUCTURES_FILE)) {
     structures = JSON.parse(fs.readFileSync(STRUCTURES_FILE, "utf8"));
 }
-
 function saveStructures() {
     fs.writeFileSync(STRUCTURES_FILE, JSON.stringify(structures, null, 2));
 }
@@ -45,11 +38,6 @@ function construct(socket, lat, long, typeId, uuid) {
 
     if (!buildable) {
         console.log(`Unknown buildable type: ${typeId}`);
-        return false;
-    }
-    if(!placementValidate(lat, long)) {
-        console.log("Build request denied for ", uuid);
-        sendInvalidDistance(socket);
         return false;
     }
     // Validate and deduct the player's resources once.
@@ -130,6 +118,7 @@ function addBuilding(building, buildable) {
     saveStructures();
 }
 
+
 function placementValidate(lat, long) {
     const rad = 0.001; //100 meters
     // Rui, we can use it for much more than just structure placement lol
@@ -153,7 +142,6 @@ function placementValidate(lat, long) {
         return true;
     }
 }
-
 module.exports = {
     addBuilding,
     construct,
