@@ -6,6 +6,7 @@ const STRUCTURES_FILE = path.join(__dirname, "../data/structures.json");
 const crypto = require("crypto");
 const { BUILDABLES_BY_ID } = require("../classes/buildableTypes");
 const playerHandler = require("./playerHandler");
+const {findDistance} = require("../util/distanceCalc");
 const RBush = require('rbush').default;
 let structures = [];
 const tree = new RBush(16);
@@ -41,10 +42,14 @@ function construct(socket, lat, long, typeId, uuid) {
         console.log(`Unknown buildable type: ${typeId}`);
         return false;
     }
+    if (!placementValidate(lat, long)) {
+        return false;
+    }
     // Validate and deduct the player's resources once.
     if (!validateRequest(socket, uuid, buildable.cost)) {
         return false;
     }
+
     let ownerId = playerHandler.findPlayerByUUID(uuid);
     uuid = ownerId.subId;
     const building = new buildable.class(lat, long, uuid);
@@ -135,12 +140,12 @@ function placementValidate(lat, long) {
         results.forEach(item => {
             console.log(`Found ID: ${item.id} at Latitude: ${item.maxY}, Longitude: ${item.maxX}`);
             if(findDistance([lat,long,item.maxY,item.maxX]) < 0.1) {
+                console.log("TOO CLOSE!");
                 return false;
             }
         });
-        return true;
     } else {
-        // debug stuff  console.log("No locations found nearby.");
+        console.log("No locations found nearby.");
         return true;
     }
 }

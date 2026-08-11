@@ -9,11 +9,28 @@
     },
     "data": {
       "hp": 3000,
-      "subId": "d4d77ee2cf7dbdc8",
+      "subId": "d42f7fc69070920f",
       "hasInventory": true,
       "isOnline": false,
       "bootTime": 1800000,
-      "bootStarted": 1786188778210
+      "bootStarted": 1786439432844
+    }
+  },
+  {
+    "owner": "k9R2vL5xW8qP3bM1",
+    "type": 0,
+    "name": "Base",
+    "position": {
+      "lat": 26.2199926,
+      "long": 78.2231491
+    },
+    "data": {
+      "hp": 3000,
+      "subId": "37493075cfe2dbb5",
+      "hasInventory": true,
+      "isOnline": false,
+      "bootTime": 1800000,
+      "bootStarted": 1786439467756
     }
   }
 ]
