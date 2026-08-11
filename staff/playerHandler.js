@@ -72,7 +72,7 @@ function updateOldPlayer(lat, long ,uuid) {
 	player.entity.lat = lat;
 	player.entity.lng = long;
 
-	savePlayers();
+	//savePlayers();
 }
 // =============== FUNCTIONS THAT SEND TO CLIENT =====================
 

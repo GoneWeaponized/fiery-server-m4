@@ -29,7 +29,9 @@ function makeStructureEntry(socket, pakket) {
 
     buildHandler.construct(socket, lat, long, typeStructure, uuid);
 }
+function getStructures(socket) {
+    buildHandler.sendStructures(socket);
+}
 
 
-
-module.exports = {makeStructureEntry};
+module.exports = {makeStructureEntry, getStructures};

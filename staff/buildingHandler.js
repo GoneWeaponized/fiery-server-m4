@@ -5,6 +5,7 @@ const fs = require('fs');
 const STRUCTURES_FILE = path.join(__dirname, "../data/structures.json");
 const crypto = require("crypto");
 const { BUILDABLES_BY_ID } = require("../classes/buildableTypes");
+const playerHandler = require("./playerHandler");
 const RBush = require('rbush').default;
 let structures = [];
 const tree = new RBush(16);
@@ -44,7 +45,8 @@ function construct(socket, lat, long, typeId, uuid) {
     if (!validateRequest(socket, uuid, buildable.cost)) {
         return false;
     }
-
+    let ownerId = playerHandler.findPlayerByUUID(uuid);
+    uuid = ownerId.subId;
     const building = new buildable.class(lat, long, uuid);
 
     addBuilding(building, buildable);
@@ -138,14 +140,75 @@ function placementValidate(lat, long) {
         });
         return true;
     } else {
-        console.log("No locations found nearby.");
+        // debug stuff  console.log("No locations found nearby.");
         return true;
     }
 }
+
+function sendStructures(socket) {
+    for (const structure of structures) {
+        try {
+            let name = structure.name;
+            let subId = structure.owner;
+            let structId = structure.data.subId;
+
+            let structIdBuf = Buffer.from(structId, 'utf8');
+            let nameBuf = Buffer.from(name, 'utf8');
+            let subIdBuf = Buffer.from(subId, 'utf8');
+
+            const sizeBuf = 2 + 1 + structIdBuf.length + 2 + nameBuf.length + subIdBuf.length + 8 + 8 + 1 + 2 + 1 + 1;
+
+            let data = Buffer.alloc(sizeBuf);
+            let offset = 0;
+
+            data.writeUInt16BE(sizeBuf, offset);
+            offset += 2;
+            data.writeUInt8(2, offset);
+            offset += 1;
+
+            structIdBuf.copy(data, offset);
+            offset += structIdBuf.length;
+
+            data.writeUInt16BE(nameBuf.length, offset);
+            offset += 2;
+
+            nameBuf.copy(data, offset);
+            offset += nameBuf.length;
+
+            subIdBuf.copy(data, offset);
+            offset += subIdBuf.length;
+
+            data.writeDoubleBE(structure.position.lat, offset);
+            offset += 8;
+
+            data.writeDoubleBE(structure.position.long, offset);
+            offset += 8;
+
+            data.writeUInt8(structure.type, offset);
+            offset += 1;
+
+            data.writeUInt16BE(structure.data.hp, offset);
+            offset += 2;
+
+            data.writeUInt8(structure.data.hasInventory ? 1 : 0, offset);
+            offset += 1;
+
+            data.writeUInt8(structure.data.isOnline ? 1 : 0, offset);
+            offset += 1;
+
+            socket.write(data);
+        } catch (error) {
+            console.log(error);
+        }
+
+    }
+}
+
 module.exports = {
     addBuilding,
     construct,
     saveStructures,
+    sendStructures,
     removeStructure
 };
 

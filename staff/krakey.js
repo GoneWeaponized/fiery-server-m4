@@ -6,6 +6,10 @@ const buildRequest =  require('./client-parser/buildRequest')
 const { createPlayer } = require('./registration');
 const construct = require('./buildingHandler');
 module.exports = function (socket, pakket) {
+	if (!pakket || pakket.length < 3) {
+		console.log("Received packet too small to process headers.");
+		return;
+	}
 
 	const lengthHeader = pakket.readUInt16BE(0);
 	const type = pakket.readUInt8(2);
@@ -25,6 +29,8 @@ module.exports = function (socket, pakket) {
 		case 3: buildRequest.makeStructureEntry(socket, pakket); break;
 
 		case 4: resourceRequests.getPlayerResources(socket, pakket); break;
+
+		case 5: buildRequest.getStructures(socket); break;
 
 		default:
 			console.log("Unknown packet type:", type);

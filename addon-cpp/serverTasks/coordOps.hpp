@@ -21,7 +21,12 @@ namespace motus {
             newPos.lat = lt; newPos.lon = ln;
             return newPos;
         }
-
+        struct Position calcBearingInit() {
+            // calculate initial bearing
+        }
+        struct Position calcBearingIntermediate() {
+            // calculate intermeditae bearing
+        }
         //TODO make a NAPI program that runs forever and shares the memory state with node
         // we can make a NAPI program separate from the main CPP program that will be called by NAPI program
         // that NAPI program will give us loaded JSON from node server and apply operations on them such as move, remove, send back to server.
