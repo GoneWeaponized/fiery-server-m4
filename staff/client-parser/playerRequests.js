@@ -1,6 +1,6 @@
 const { Buffer } = require('node:buffer');
 const registration = require('../registration');
-const playerHandler = require('../playerHandler')
+const playerHandler = require('../playerHandler');
 
 let offset = 3;
 
@@ -37,6 +37,7 @@ function updateLoc(socket, pakket) {
         23,
         23 + idLength
     );
+    playerHandler.registerSocket(uuid, socket);
 
     playerHandler.updateOldPlayer(lat, long, uuid);
     playerHandler.getPlayersClient(socket, uuid); // Hey rui can you add some loop that sends this typa data when a guy updates location once. Sends until player disonnects

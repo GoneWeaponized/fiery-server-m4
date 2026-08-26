@@ -6,6 +6,7 @@ const connectedClients = new Map();
 
 function registerSocket(uuid, socket) {
     connectedClients.set(uuid, socket);
+	console.log(connectedClients.size);
 }
 
 function unregisterSocket(uuid) {
@@ -146,6 +147,16 @@ function playerInfo(username) {
 	}
 }
 
+function printMap() {
+	console.log("--- Connected Client IPs ---");
+	for (const [uuid, socket] of connectedClients.entries()) {
+		// socket.remoteAddress contains the client's IP address
+		const ip = socket.remoteAddress;
+		console.log(`UUID: ${uuid} -> IP: ${ip}`);
+	}
+	console.log("----------------------------");
+}
+
 function broadcast(packet) {
 
     for (const socket of connectedClients.values()) {
@@ -201,6 +212,7 @@ function sendAmbientEvent(event) {
 
 module.exports = {
 	getPlayersClient,
+	connectedClients,
 	updateOldPlayer,
 	listPlayers,
 	findPlayerByName,
@@ -212,6 +224,7 @@ module.exports = {
     unregisterSocket,
     broadcast,
     sendAmbientEvent,
-	getMyData
+	getMyData,
+	printMap
 };
 

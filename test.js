@@ -4,7 +4,7 @@ const PORT = 5010;
 const HOST = '127.0.0.1';
 
 
-const uuid = "b1968097-e099-4195-8b9d-d586d82d816a";
+const uuid = "f28fb523-a082-4184-9591-be4959c939b2";
 const idLength = Buffer.byteLength(uuid, 'utf8');
 const packetSize = 2 + 1 + 8 + 8 + 4 + idLength;
 

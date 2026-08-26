@@ -53,6 +53,9 @@ rl.on("line", line => {
         console.log("Quitting.");
         process.exit();
         break;
+        case "printMap":
+            playerHandler.printMap();
+            break;
         case "list players":
             playerHandler.listPlayers();
             break;
