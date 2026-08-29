@@ -2,9 +2,10 @@ const { Buffer } = require('node:buffer');
 const registration = require('../registration');
 const playerHandler = require('../playerHandler');
 
-let offset = 3;
+
 
 function makePlayerEntry(socket, pakket) {
+    let offset = 3;
     const usernameLength = pakket.readUInt16BE(offset);
     offset += 2;
 

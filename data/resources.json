@@ -1,29 +1,15 @@
 [
   {
-    "owner": "f1a52f93-76c5-4f52-ac8e-7475dcbe127c",
+    "owner": "7ab7442a-e6c4-4016-843a-74b78c3d88f1",
     "resources": {
-      "money": 70000,
-      "manpower": 3783
-    }
-  },
-  {
-    "owner": "f28fb523-a082-4184-9591-be4959c939b2",
-    "resources": {
-      "money": 265000,
+      "money": 370000,
       "manpower": 50000
     }
   },
   {
-    "owner": "0c7dc9aa-d6f1-4693-9e49-afbd6acdc368",
+    "owner": "6a7ec207-38e5-4a39-a55a-5ac9350c8089",
     "resources": {
-      "money": 760000,
-      "manpower": 50000
-    }
-  },
-  {
-    "owner": "43bfac04-ea4a-4605-88d5-de05f9c7a469",
-    "resources": {
-      "money": 40000,
+      "money": 370000,
       "manpower": 50000
     }
   }

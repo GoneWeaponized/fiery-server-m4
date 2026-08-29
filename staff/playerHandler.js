@@ -2,15 +2,16 @@ const fs = require('fs');
 const { Buffer } = require('node:buffer');
 const path = require("path");
 const connectedClients = new Map();
-
+const mappedClients = new Map();
 
 function registerSocket(uuid, socket) {
     connectedClients.set(uuid, socket);
-	console.log(connectedClients.size);
+	mappedClients.set(socket, uuid);
 }
 
-function unregisterSocket(uuid) {
+function unregisterSocket(uuid, socket) {
     connectedClients.delete(uuid);
+	mappedClients.delete(socket);
 }
 
 
@@ -149,7 +150,7 @@ function playerInfo(username) {
 
 function printMap() {
 	console.log("--- Connected Client IPs ---");
-	for (const [uuid, socket] of connectedClients.entries()) {
+	for (const [socket, uuid] of mappedClients.entries()) {
 		// socket.remoteAddress contains the client's IP address
 		const ip = socket.remoteAddress;
 		console.log(`UUID: ${uuid} -> IP: ${ip}`);

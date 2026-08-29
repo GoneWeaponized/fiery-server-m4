@@ -18,7 +18,7 @@ function makeResEntry(uuid) {
     resourceOwner = {
         owner: uuid,
         resources: {
-            money: 40000,
+            money: 400000,
             manpower: 50000
         }
     };

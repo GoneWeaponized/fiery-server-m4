@@ -1,42 +1,22 @@
 [
   {
-    "uuid": "f28fb523-a082-4184-9591-be4959c939b2",
-    "username": "bigMan",
-    "subId": "k9R2vL5xW8qP3bM1",
-    "entity": {
-      "type": "admin",
-      "lat": 54.2322178,
-      "lng": 3.894163
-    }
-  },
-  {
-    "uuid": "f1a52f93-76c5-4f52-ac8e-7475dcbe127c",
+    "uuid": "7ab7442a-e6c4-4016-843a-74b78c3d88f1",
     "username": "bathtub",
-    "subId": "401436d886d983ff",
+    "subId": "b00ce322dca73c49",
     "entity": {
       "type": "player",
-      "lat": 26.2188735,
-      "lng": 78.2231205
+      "lat": 26.2199042,
+      "lng": 78.2231631
     }
   },
   {
-    "uuid": "0c7dc9aa-d6f1-4693-9e49-afbd6acdc368",
-    "username": "Lolmantrollman",
-    "subId": "c562e3dc6bf9d23a",
+    "uuid": "6a7ec207-38e5-4a39-a55a-5ac9350c8089",
+    "username": "advocatfh",
+    "subId": "a2692d068b1d174a",
     "entity": {
       "type": "player",
-      "lat": 34.634234,
-      "lng": 82.93432
-    }
-  },
-  {
-    "uuid": "43bfac04-ea4a-4605-88d5-de05f9c7a469",
-    "username": "plasticfoods",
-    "subId": "8600a9354dbd6d8e",
-    "entity": {
-      "type": "player",
-      "lat": 26.2199196,
-      "lng": 78.2231826
+      "lat": 52.8042882,
+      "lng": -2.123182
     }
   }
 ]

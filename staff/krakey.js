@@ -18,7 +18,12 @@ module.exports = function (socket, pakket) {
 	switch (type) {
 
 		case 0: {
-			playerRequests.makePlayerEntry(socket, pakket);
+			try {
+				playerRequests.makePlayerEntry(socket, pakket);
+			} catch(error) {
+				console.log("Error in making player Entry.\n", error);
+			}
+
 			break;
 		}
 
