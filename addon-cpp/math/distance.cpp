@@ -1,6 +1,4 @@
 #include "haversine.h"
-#include <iostream>
-#include <cmath>
 #include <napi.h>
 
 Napi::Value getDistance(const Napi::CallbackInfo& info) {

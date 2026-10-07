@@ -5,7 +5,7 @@ const playerHandler = require("./staff/playerHandler");
 const buildHandler = require("./staff/buildingHandler");
 const {spawnEvent} = require('./ambient/spawnEvent'); //Ambient Event Spawning
 const { spawn } = require('child_process');
-
+const { Buffer } = require('buffer');
 const PORT = 5010;
 const MAX_LENGTH = 65536;
 const rl = readline.createInterface({

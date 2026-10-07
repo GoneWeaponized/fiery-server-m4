@@ -1,10 +1,11 @@
 {
   "targets": [
     {
-      "target_name": "addon-cpp",
+      "target_name": "FE_engine",
       "sources": [
-      "./addon-cpp/math/distance.cpp" ,
-      "./addon-cpp/math/haversine.cpp"
+      "./fieryEngine/FE_nodeLink.cpp",
+      "./fieryEngine/FE_engine.cpp",
+      "./fieryEngine/FEmodules/FE_core.cpp"
       ],
       "include_dirs": [
         "<!@(node -p \"require('node-addon-api').include\")"

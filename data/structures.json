@@ -1,36 +1,53 @@
 [
   {
-    "owner": "b00ce322dca73c49",
-    "type": 0,
-    "name": "Base",
-    "position": {
-      "lat": 26.2199111,
-      "long": 78.2231331
-    },
     "data": {
-      "hp": 3000,
-      "subId": "3b250e42cfe42ded",
-      "hasInventory": true,
-      "isOnline": false,
+      "bootStarted": 0,
       "bootTime": 1800000,
-      "bootStarted": 1788002304590
-    }
+      "hasInventory": false,
+      "hp": 34000,
+      "isOnline": false,
+      "subId": "730ec4aeee6ba016"
+    },
+    "name": "noName",
+    "owner": "a2692d068b1d174a",
+    "position": {
+      "lat": 34.2,
+      "long": 45.983
+    },
+    "type": 1
   },
   {
+    "data": {
+      "bootStarted": 0,
+      "bootTime": 1800000,
+      "hasInventory": false,
+      "hp": 3000,
+      "isOnline": false,
+      "subId": "730ec4a76f6ba016"
+    },
+    "name": "noName",
     "owner": "a2692d068b1d174a",
-    "type": 0,
-    "name": "Base",
     "position": {
       "lat": 52.8040198,
       "long": -2.1228063
     },
+    "type": 0
+  },
+  {
     "data": {
-      "hp": 3000,
-      "subId": "730ec4a76f6ba016",
-      "hasInventory": true,
-      "isOnline": false,
+      "bootStarted": 0,
       "bootTime": 1800000,
-      "bootStarted": 1788003723290
-    }
+      "hasInventory": false,
+      "hp": 3000,
+      "isOnline": false,
+      "subId": "3b250e42cfe42ded"
+    },
+    "name": "noName",
+    "owner": "b00ce322dca73c49",
+    "position": {
+      "lat": 26.2199111,
+      "long": 78.2231331
+    },
+    "type": 0
   }
 ]

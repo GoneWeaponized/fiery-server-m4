@@ -1,4 +1,3 @@
-const krakey = require('./krakey');
 const path = require("path");
 const resourceHandler = require('./resourceHandler');
 const fs = require('fs');
@@ -8,8 +7,12 @@ const { BUILDABLES_BY_ID } = require("../classes/buildableTypes");
 const playerHandler = require("./playerHandler");
 const {findDistance} = require("../util/distanceCalc");
 const RBush = require('rbush').default;
+const FE = require('../build/Release/FE_engine');
+
 let structures = [];
+
 const tree = new RBush(16);
+
 if (fs.existsSync(STRUCTURES_FILE)) {
     structures = JSON.parse(fs.readFileSync(STRUCTURES_FILE, "utf8"));
 }
@@ -61,6 +64,7 @@ function construct(socket, lat, long, typeId, uuid) {
 
 function addStructure(structure) {
     structures.push(structure);
+    FE.addStr(structure.data.subId, structure.owner, structure.hp,structure.position.lat, structure.position.lat, structure.position.long, structure.position.long); // subId, owner, hp, lat ab, long cd
     const formattedItem = {
         minX: structure.position.long,
         minY: structure.position.lat,
@@ -208,7 +212,18 @@ function sendStructures(socket) {
 
     }
 }
-
+for (const structure of structures) {
+    if(FE.addStr(structure.data.subId, structure.owner, structure.data.hp,structure.position.lat, structure.position.lat, structure.position.long, structure.position.long)) {
+        console.log("Added a new strucutre");
+    }
+}
+const a = new Float64Array([52.8040198, -7.1228063]);
+const b = new Float64Array([52.8040198, -2.1228063]);
+if (FE.addMissile("5abd",a,b, 30000.0)) {
+    console.log("Added a missile!");
+}
+FE.startEngine();
+console.log("\n\n\nEngine started in background. Watching simulation...\n\n\n");
 module.exports = {
     addBuilding,
     construct,

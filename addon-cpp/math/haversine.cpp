@@ -1,6 +1,5 @@
 #include "haversine.h"
 #include <cmath>
-#include <iostream>
 
 double haversine(double lt1, double ln1, double lt2, double ln2) {
     double dRad = 6371;

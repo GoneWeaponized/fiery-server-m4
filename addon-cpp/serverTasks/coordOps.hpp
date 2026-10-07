@@ -3,11 +3,10 @@
 #ifndef COORD_OPS_HPP
 #define COORD_OPS_HPP
 
-#include <iostream>
-#include <iomanip>
+
 #include <cmath>
 
-double R =  6378137.0;
+const double R =  6378137.0;
 constexpr double RAD_TO_DEG = 180.0 / M_PI;
 namespace motus {
     struct Position {
@@ -25,8 +24,23 @@ namespace motus {
             double ln = ln1 + atan2(sin(bear)*sin(angDist)*cos(lt1), cos(angDist)-sin(lt1)*sin(lt));
             struct Position newPos;
             newPos.lat = lt * RAD_TO_DEG; newPos.lon = ln * RAD_TO_DEG;
+            newPos.lon = std::fmod(newPos.lon + 540.0, 360.0) - 180.0;
             return newPos;
         }
+        double initialBearing(double lat1, double lon1, double lat2, double lon2) {
+            double phi1 = lat1 * M_PI / 180.0;
+            double phi2 = lat2 * M_PI / 180.0;
+            double deltaLambda = (lon2 - lon1) * M_PI / 180.0;
+
+            double y = std::sin(deltaLambda) * std::cos(phi2);
+            double x = std::cos(phi1) * std::sin(phi2) -
+            std::sin(phi1) * std::cos(phi2) * std::cos(deltaLambda);
+
+            double theta = std::atan2(y, x);
+            double bearingDeg = theta * (180.0 / M_PI);
+            return std::fmod(bearingDeg + 360.0, 360.0);
+        }
+
         // struct Position calcBearingInit() {
         //     // calculate initial bearing
         // }

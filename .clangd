@@ -1,0 +1,4 @@
+CompileFlags:
+  Add:
+    - -I/home/shkutko-vasilevich/node_modules/node-addon-api
+    - -I/usr/include/node/
