@@ -1,5 +1,5 @@
-# fieryServer Model 4
-Now binary Protocol based, game server project for FieryEscalation (FEscalation)
+# FieryServer Model 4C
+A binary protocol-based game server project for FieryEscalation (FEscalation)
+The network part is written in JS, while the fieryEngine is written in C++
 
-
-- I think I beautified it?? may not?
+- I think I beautified it?? Maybe not?
