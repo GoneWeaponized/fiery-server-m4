@@ -7,7 +7,7 @@
 
 namespace FE {
     namespace engine {
-        void addToMap(std::string subId, double pos[], double dest[], float speed);
+        void addMissile(std::string subId, double pos[], double dest[], float speed);
         void removeFromMap(std::string key);
         void moveMissile(std::string key);
         void startEngine();

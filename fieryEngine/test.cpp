@@ -11,27 +11,45 @@ using Geo = motus::GeoOp;
 using Pos = motus::Position;
 using GeoObj = motus::GenericGeoObject;
 
-std::atomic<bool> simulationRunning{false};
+std::atomic<bool> simulationRunning{true};
 std::mutex geoObjMutex;
 Geo geo;
 std::chrono::seconds tickRate = std::chrono::seconds(1);
-std::unordered_map<int, GeoObj> activeGeoObj;
-int numOMissiles = 0;
+std::unordered_map<std::string, GeoObj> activeGeoObj;
+
+std::string generate_random_string(std::size_t length) {
+    // 1. Define the character pool you want to pick from
+    const std::string characters = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+
+    // 2. Initialize the random number engine
+    std::random_device rd;                             // Obtains a random seed from hardware
+    std::mt19937 generator(rd());                      // Standard mersenne_twister_engine
+    std::uniform_int_distribution<> distribution(0, characters.size() - 1);
+
+    // 3. Build the string
+    std::string random_string;
+    random_string.reserve(length); // Optimize memory allocation
+
+    for (std::size_t i = 0; i < length; ++i) {
+        random_string += characters[distribution(generator)];
+    }
+
+    return random_string;
+}
 
 void addGeoObject(Pos start, Pos dest, float speed) {
     GeoObj newGeoObj;
-    numOMissiles++;
     newGeoObj.position = start;
     newGeoObj.startPosition = start;
     newGeoObj.targetPosition = dest;
     newGeoObj.speed = speed;
     newGeoObj.totalAngularDistance = geo.angularDistanceTo(start, dest);
     newGeoObj.bearing = geo.bearingTo(start, dest);
-    newGeoObj.id = numOMissiles;
+    newGeoObj.id = generate_random_string(16);
 
     {
         std::lock_guard<std::mutex> lock(geoObjMutex);
-        activeGeoObj.insert({numOMissiles, newGeoObj});
+        activeGeoObj.insert({newGeoObj.id, newGeoObj});
     }
 
 }
@@ -96,7 +114,11 @@ void addRandomGeoObjects(int count)
             lonDist(generator)
         };
 
-        addGeoObject(start, destination, 3000.0f);
+        addGeoObject(start, destination, 300000.0f);
     }
 }
 
+int main() {
+    addRandomGeoObjects(8);
+    iterativeUpdates();
+}

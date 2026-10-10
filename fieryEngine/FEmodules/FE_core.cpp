@@ -1,121 +1,113 @@
 #include "../lib/RTree.h"
 
 #include "FE_core.hpp"
-#include <iostream>
 #include <cmath>
+#include <iostream>
+#include <unordered_map>
 
 constexpr int MAX_NODES = 16;
 
-RTree<structureItem*, double, 2, double, MAX_NODES> structuresTree;
+RTree<structureItem *, double, 2, double, MAX_NODES> structuresTree;
+
 int count = 0;
-        void FE::core::insertStructure(double a, double b, double c, double d, float hp, std::string id, std::string own) {
-            structureItem* newStr = new structureItem;
-            newStr->min[0] = a;
-            newStr->max[0] = b;
-            newStr->min[1] = c;
-            newStr->max[1] = d;
-            newStr->HP = hp;
-            newStr->owner = own;
-            newStr->subId = id;
-            structuresTree.Insert(newStr->min, newStr->max, newStr);
-            std::cout<<"Entry made. SubId:"<<newStr->subId<<std::endl;
+
+void FE::core::addMsl(warhead_type warhead, float payloadSize, float mslSpeed,
+                      motus::GenericGeoObject mslObj) {
+  missileItem *missile =
+      new missileItem(warhead, payloadSize, mslSpeed, mslObj);
+  missileMap.insert({missile->missileObject.id, missile});
+}
+
+void FE::core::insertStructure(double a, double b, double c, double d, float hp,
+                               std::string id, std::string own) {
+  structureItem *newStr = new structureItem;
+  newStr->min[0] = a;
+  newStr->max[0] = b;
+  newStr->min[1] = c;
+  newStr->max[1] = d;
+  newStr->HP = hp;
+  newStr->owner = own;
+  newStr->subId = id;
+  structuresTree.Insert(newStr->min, newStr->max, newStr);
+  mapStructures.insert({id, newStr});
+  std::cout << "Entry made. SubId:" << newStr->subId << std::endl;
+}
+bool FE::core::searchAndGo(structureItem *val) { return true; }
+bool FE::core::searchAndStop(structureItem *val) { return false; }
+bool FE::core::searchAndGetWithinDistance(structureItem *val,
+                                          motus::Position pos, float distance) {
+  if (motus::GeoOp::distance(pos.lat, pos.lon, val->min[0], val->min[1]) <
+      distance) {
+    return true;
+  }
+  return false;
+}
+bool FE::core::isWithinBB(motus::Position pos) {
+  structureItem *temp = new structureItem;
+  temp->min[0] = pos.lat;
+  temp->max[0] = pos.lat;
+  temp->min[1] = pos.lon;
+  temp->max[1] = pos.lon;
+  if (structuresTree.Search(temp->min, temp->max, FE::core::searchAndStop) >
+      0) {
+    delete temp;
+    return true;
+  }
+  return false;
+}
+bool FE::core::isWithinBB(motus::Position pos, float distance) {
+  structureItem *temp = new structureItem;
+  temp->min[0] = pos.lat;
+  temp->max[0] = pos.lat;
+  temp->min[1] = pos.lon;
+  temp->max[1] = pos.lon;
+  // the lambda as parameter is added to check if there's an object within a
+  // given distance [] catches distance and pos () provides requested
+  // structureItem* val and the body returns a boolean.
+  structuresTree.Search(
+      temp->min, temp->max, [&temp, distance, pos](structureItem *val) {
+        if (motus::GeoOp::distance(pos.lat, pos.lon, val->min[0], val->min[1]) <
+            distance) {
+          return false;
         }
-        bool FE::core::searchAndGo(structureItem* val) {
-            return true;
-        }
-        bool FE::core::searchAndStop(structureItem* val) {
-            return false;
-        }
-        bool FE::core::searchAndGetWithinDistance(structureItem* val, motus::Position pos, float distance) {
-            if (
-                motus::GeoOp::distance(pos.lat, pos.lon, val->min[0], val->min[1])<distance
-            ) {
-                return true;
-            }
-            return false;
-        }
-        bool FE::core::isWithinBB(motus::Position pos) {
-            structureItem* temp = new structureItem;
-            temp->min[0] = pos.lat;
-            temp->max[0] = pos.lat;
-            temp->min[1] = pos.lon;
-            temp->max[1] = pos.lon;
-            if (structuresTree.Search(temp->min, temp->max, FE::core::searchAndStop) > 0) {
-                delete temp;
-                return true;
-            }
-            return false;
-        }
-        bool FE::core::isWithinBB(motus::Position pos, float distance) {
-            structureItem* temp = new structureItem;
-            temp->min[0] = pos.lat;
-            temp->max[0] = pos.lat;
-            temp->min[1] = pos.lon;
-            temp->max[1] = pos.lon;
-            // the lambda as parameter is added to check if there's an object within a given distance [] catches distance and pos () provides requested structureItem* val and the body returns a boolean.
-            structuresTree.Search(temp->min, temp->max, [&temp, distance, pos](structureItem* val) {
-                if (
-                    motus::GeoOp::distance(pos.lat, pos.lon, val->min[0], val->min[1])<distance
-                ) {
-                    return false;
-                }
-                return false;
-            });
-            delete temp;
-            return false;
-        }
-        void FE::core::damageEvent(
-            motus::Position pos,
-            float distance,
-            float yield
-        ) {
-            double latRadius = distance / 111320.0;
+        return false;
+      });
+  delete temp;
+  return false;
+}
+float FE::core::dmgVal(warhead_type wh, float distance, float payloadSize) {
+    switch ((int)wh) {
+    HIGH_EXPLOSIVE: return ((payloadSize*2)/distance)*25;
+    HEAT: return ((payloadSize*0.8)/distance)*15;
+    default: return 1.0;
+}
+}
+void FE::core::damageEvent(motus::Position pos, float distance, missileItem& msl) {
+  double latRadius = distance / 111320.0;
 
-            double lonRadius =
-            distance /
-            (111320.0 * std::cos(pos.lat * M_PI / 180.0));
+  double lonRadius = distance / (111320.0 * std::cos(pos.lat * M_PI / 180.0));
 
-            double min[2] = {
-                pos.lat - latRadius,
-                pos.lon - lonRadius
-            };
+  double min[2] = {pos.lat - latRadius, pos.lon - lonRadius};
 
-            double max[2] = {
-                pos.lat + latRadius,
-                pos.lon + lonRadius
-            };
+  double max[2] = {pos.lat + latRadius, pos.lon + lonRadius};
 
-            structuresTree.Search(
-                min,
-                max,
-                [pos, distance, yield](structureItem* val) {
+  structuresTree.Search(min, max, [pos, distance, msl](structureItem *val) {
+    double structureLat = (val->min[0] + val->max[0]) / 2.0;
 
-                    double structureLat =
-                    (val->min[0] + val->max[0]) / 2.0;
+    double structureLon = (val->min[1] + val->max[1]) / 2.0;
 
-                    double structureLon =
-                    (val->min[1] + val->max[1]) / 2.0;
+    double d =
+        motus::GeoOp::distance(pos.lat, pos.lon, structureLat, structureLon);
+        val->HP = dmgVal(msl.wh, distance, msl.payload);
+    if (d <= distance) {
+      count++;
+      std::cout << "Structure hit! "<<"HP: "<<val->HP<<std::endl;
+    }
 
-                    double d = motus::GeoOp::distance(
-                        pos.lat,
-                        pos.lon,
-                        structureLat,
-                        structureLon
-                    );
+    return false;
+  });
+}
 
-                    if (d <= distance) {
-                        count++;
-                        val->HP = val->HP - yield*distance;
-                        std::cout
-                        << "Structure hit at "
-                        << structureLat << ", "
-                        << structureLon <<" " << '\n';
-                    }
-
-                    return false;
-                }
-            );
-        }
 // int main() {
 //     // main code for testing
 //     FE::core::insertRect(0.0, 0.01, 0.0, 0.01);
