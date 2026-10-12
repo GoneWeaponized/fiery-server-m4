@@ -3,7 +3,7 @@ const net = require('net');
 const client = new net.Socket();
 const PORT = 5010;
 const HOST = '127.0.0.1';
-const uuid = "0c7dc9aa-d6f1-4693-9e49-afbd6acdc368";
+const uuid = "6a7ec207-38e5-4a39-a55a-5ac9350c8089";
 const packet = Buffer.alloc(uuid.length + 7);
 
 packet.writeUInt16BE(packet.length, 0);

@@ -2,14 +2,18 @@
 #define FE_CAUSATION_HPP
 
 #include "../GeoOp.hpp"
-#include "./FE_core.hpp"
 // fiery engine module - causation is for triggering geo events
 namespace FE {
-    class events {
-      void damageEvent(float distance, motus::Position pos) {
-
-      }
-    };
+class events {
+    // this class will contain certain events that are not to be written in the FE::core
+    // where damage event is in FE::core i'd let that be as it is, I see no need for it to be put here
+    // a vision on these events is such:
+    /*
+     * Zombies/Pirates/Rescue events and behaviour and how they interact with the core game.
+     * Random resource events
+     * hourly wealth and such
+     */
+};
 }
 
 #endif

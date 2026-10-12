@@ -5,7 +5,7 @@ const STRUCTURES_FILE = path.join(__dirname, "../data/structures.json");
 const crypto = require("crypto");
 const { BUILDABLES_BY_ID } = require("../classes/buildableTypes");
 const playerHandler = require("./playerHandler");
-const {findDistance} = require("../util/distanceCalc");
+//const {findDistance} = require("../util/distanceCalc");
 const RBush = require('rbush').default;
 const FE = require('../build/Release/FE_engine');
 
@@ -130,28 +130,37 @@ function addBuilding(building, buildable) {
 }
 
 
+// function placementValidate(lat, long) {
+//     const rad = 0.001; //100 meters
+//     // Rui, we can use it for much more than just structure placement lol
+//     const searchBox = {
+//         minX: long - rad,
+//         minY: lat - rad,
+//         maxX: long + rad,
+//         maxY: lat + rad
+//     };
+//     const results = tree.search(searchBox);
+//     if (results.length > 0) {
+//         results.forEach(item => {
+//             console.log(`Found ID: ${item.id} at Latitude: ${item.maxY}, Longitude: ${item.maxX}`);
+//             if(findDistance([lat,long,item.maxY,item.maxX]) < 0.1) {
+//                 console.log("TOO CLOSE!");
+//                 return false;
+//             }
+//         });
+//     } else {
+//         console.log("No locations found nearby.");
+//         return true;
+//     }
+// }
+
 function placementValidate(lat, long) {
-    const rad = 0.001; //100 meters
-    // Rui, we can use it for much more than just structure placement lol
-    const searchBox = {
-        minX: long - rad,
-        minY: lat - rad,
-        maxX: long + rad,
-        maxY: lat + rad
-    };
-    const results = tree.search(searchBox);
-    if (results.length > 0) {
-        results.forEach(item => {
-            console.log(`Found ID: ${item.id} at Latitude: ${item.maxY}, Longitude: ${item.maxX}`);
-            if(findDistance([lat,long,item.maxY,item.maxX]) < 0.1) {
-                console.log("TOO CLOSE!");
-                return false;
-            }
-        });
-    } else {
-        console.log("No locations found nearby.");
-        return true;
+    const rad = 0.001; //100m
+    const result = FE.isInBB(lat, long, rad);
+    if (result) {
+        console.log("Yep. its close.");
     }
+    else { console.log("Nah bro");}
 }
 
 function sendStructures(socket) {

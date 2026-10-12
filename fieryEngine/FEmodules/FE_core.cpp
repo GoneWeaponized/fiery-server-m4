@@ -7,142 +7,188 @@
 
 constexpr int MAX_NODES = 16;
 
-RTree<structureItem *, double, 2, double, MAX_NODES> structuresTree;
+RTree<structureItem*, double, 2, double, MAX_NODES> structuresTree;
 
 int count = 0;
 
 void FE::core::addMsl(warhead_type warhead, float payloadSize, float mslSpeed,
-                      motus::GenericGeoObject mslObj) {
-  missileItem *missile =
-      new missileItem(warhead, payloadSize, mslSpeed, mslObj);
-  missileMap.insert({missile->missileObject.id, missile});
+    motus::GenericGeoObject mslObj)
+{
+    missileItem* missile = new missileItem(warhead, payloadSize, mslSpeed, mslObj);
+    missileMap.insert({ missile->missileObject.id, missile });
 }
 
 void FE::core::insertStructure(double a, double b, double c, double d, float hp,
-                               std::string id, std::string own) {
-  structureItem *newStr = new structureItem;
-  newStr->min[0] = a;
-  newStr->max[0] = b;
-  newStr->min[1] = c;
-  newStr->max[1] = d;
-  newStr->HP = hp;
-  newStr->owner = own;
-  newStr->subId = id;
-  structuresTree.Insert(newStr->min, newStr->max, newStr);
-  mapStructures.insert({id, newStr});
-  std::cout << "Entry made. SubId:" << newStr->subId << std::endl;
+    std::string id, std::string own)
+{
+    structureItem* newStr = new structureItem;
+    newStr->min[0] = a;
+    newStr->max[0] = b;
+    newStr->min[1] = c;
+    newStr->max[1] = d;
+    newStr->HP = hp;
+    newStr->owner = own;
+    newStr->subId = id;
+    structuresTree.Insert(newStr->min, newStr->max, newStr);
+    mapStructures.insert({ id, newStr });
+    std::cout << "Entry made. SubId:" << newStr->subId << std::endl;
 }
-bool FE::core::searchAndGo(structureItem *val) { return true; }
-bool FE::core::searchAndStop(structureItem *val) { return false; }
-bool FE::core::searchAndGetWithinDistance(structureItem *val,
-                                          motus::Position pos, float distance) {
-  if (motus::GeoOp::distance(pos.lat, pos.lon, val->min[0], val->min[1]) <
-      distance) {
-    return true;
-  }
-  return false;
+bool FE::core::searchAndGo(structureItem* val) { return true; }
+bool FE::core::searchAndStop(structureItem* val) { return false; }
+bool FE::core::searchAndGetWithinDistance(structureItem* val,
+    motus::Position pos, float distance)
+{
+    if (motus::GeoOp::distance(pos.lat, pos.lon, val->min[0], val->min[1]) < distance) {
+        return true;
+    }
+    return false;
 }
-bool FE::core::isWithinBB(motus::Position pos) {
-  structureItem *temp = new structureItem;
-  temp->min[0] = pos.lat;
-  temp->max[0] = pos.lat;
-  temp->min[1] = pos.lon;
-  temp->max[1] = pos.lon;
-  if (structuresTree.Search(temp->min, temp->max, FE::core::searchAndStop) >
-      0) {
+bool FE::core::isWithinBB(motus::Position pos)
+{
+    structureItem* temp = new structureItem;
+    temp->min[0] = pos.lat;
+    temp->max[0] = pos.lat;
+    temp->min[1] = pos.lon;
+    temp->max[1] = pos.lon;
+    if (structuresTree.Search(temp->min, temp->max, FE::core::searchAndStop) > 0) {
+        delete temp;
+        return true;
+    }
+    return false;
+}
+bool FE::core::isWithinBB(motus::Position pos, float distance)
+{
+    structureItem* temp = new structureItem;
+    temp->min[0] = pos.lat;
+    temp->max[0] = pos.lat;
+    temp->min[1] = pos.lon;
+    temp->max[1] = pos.lon;
+    bool result;
+    // the lambda as parameter is added to check if there's an object within a
+    // given distance [] catches distance and pos () provides requested
+    // structureItem* val and the body returns a boolean.
+    structuresTree.Search(
+        temp->min, temp->max, [&result, &temp, distance, pos](structureItem* val) {
+            if (motus::GeoOp::distance(pos.lat, pos.lon, val->min[0], val->min[1]) < distance) {
+                result = false;
+                return false;
+            }
+            return true;
+        });
     delete temp;
-    return true;
-  }
-  return false;
+    return result;
 }
-bool FE::core::isWithinBB(motus::Position pos, float distance) {
-  structureItem *temp = new structureItem;
-  temp->min[0] = pos.lat;
-  temp->max[0] = pos.lat;
-  temp->min[1] = pos.lon;
-  temp->max[1] = pos.lon;
-  // the lambda as parameter is added to check if there's an object within a
-  // given distance [] catches distance and pos () provides requested
-  // structureItem* val and the body returns a boolean.
-  structuresTree.Search(
-      temp->min, temp->max, [&temp, distance, pos](structureItem *val) {
-        if (motus::GeoOp::distance(pos.lat, pos.lon, val->min[0], val->min[1]) <
-            distance) {
-          return false;
-        }
-        return false;
-      });
-  delete temp;
-  return false;
-}
-float FE::core::dmgVal(warhead_type wh, float distance, float payloadSize) {
+
+float FE::core::dmgVal(warhead_type wh, float distance, float payloadSize)
+{
     switch ((int)wh) {
-    HIGH_EXPLOSIVE: return ((payloadSize*2)/distance)*25;
-    HEAT: return ((payloadSize*0.8)/distance)*15;
-    default: return 1.0;
+    case HIGH_EXPLOSIVE:
+        return ((payloadSize * 2) / distance) * 25;
+    case HEAT:
+        return ((payloadSize * 0.8) / distance) * 15;
+    default:
+        return 1.0;
+    }
 }
-}
-void FE::core::damageEvent(motus::Position pos, float distance, missileItem& msl) {
-  double latRadius = distance / 111320.0;
 
-  double lonRadius = distance / (111320.0 * std::cos(pos.lat * M_PI / 180.0));
-
-  double min[2] = {pos.lat - latRadius, pos.lon - lonRadius};
-
-  double max[2] = {pos.lat + latRadius, pos.lon + lonRadius};
-
-  structuresTree.Search(min, max, [pos, distance, msl](structureItem *val) {
-    double structureLat = (val->min[0] + val->max[0]) / 2.0;
-
-    double structureLon = (val->min[1] + val->max[1]) / 2.0;
-
-    double d =
-        motus::GeoOp::distance(pos.lat, pos.lon, structureLat, structureLon);
-        val->HP = dmgVal(msl.wh, distance, msl.payload);
-    if (d <= distance) {
-      count++;
-      std::cout << "Structure hit! "<<"HP: "<<val->HP<<std::endl;
+void FE::core::damageEvent(
+    motus::Position pos,
+    float blastRadiusMeters,
+    missileItem& msl)
+{
+    if (blastRadiusMeters <= 0.0f) {
+        return;
     }
 
-    return false;
-  });
+    constexpr double EARTH_RADIUS_METERS = 6378137.0;
+
+    double latRadius = (blastRadiusMeters / EARTH_RADIUS_METERS)
+        * (180.0 / M_PI);
+
+    double cosLat = std::cos(pos.lat * M_PI / 180.0);
+    if (std::abs(cosLat) < 1e-10) {
+        std::cerr << "Blast longitude bounds undefined near pole\n";
+        return;
+    }
+
+    double lonRadius = (blastRadiusMeters / (EARTH_RADIUS_METERS * cosLat))
+        * (180.0 / M_PI);
+
+    double min[2] = {
+        pos.lat - latRadius,
+        pos.lon - lonRadius
+    };
+
+    double max[2] = {
+        pos.lat + latRadius,
+        pos.lon + lonRadius
+    };
+
+    std::cout << "\nExplosion at: "
+              << pos.lat << ", " << pos.lon
+              << "\nBlast radius: " << blastRadiusMeters << " m\n";
+
+    int candidates = structuresTree.Search(
+        min,
+        max,
+        [&pos, blastRadiusMeters, &msl](structureItem* val) {
+            double structureLat = (val->min[0] + val->max[0]) / 2.0;
+
+            double structureLon = (val->min[1] + val->max[1]) / 2.0;
+            double d = motus::GeoOp::distance(
+                pos.lat,
+                pos.lon,
+                structureLat,
+                structureLon);
+
+            std::cout << "Checking " << val->subId
+                      << ": distance = " << d << " m\n";
+            if (d > blastRadiusMeters) {
+                return true;
+            }
+            float damage = FE::core::dmgVal(
+                msl.wh,
+                static_cast<float>(d),
+                msl.payload);
+
+            val->HP = std::max(0.0f, val->HP - damage);
+
+            ++count;
+
+            std::cout << "STRUCTURE HIT: " << val->subId
+                      << "\nDamage: " << damage
+                      << "\nRemaining HP: " << val->HP
+                      << '\n';
+
+            return true;
+        });
+
+    std::cout << "R-tree candidates found: " << candidates << '\n';
 }
 
-// int main() {
-//     // main code for testing
-//     FE::core::insertRect(0.0, 0.01, 0.0, 0.01);
-//     FE::core::insertRect(0.02, 0.03, 0.02, 0.03);
-//     FE::core::insertRect(0.05, 0.06, 0.05, 0.06);
-//     FE::core::insertRect(22.7196, 22.7200, 75.8500, 75.8505); // S1
-//     FE::core::insertRect(22.7250, 22.7255, 75.8500, 75.8505); // S2
-//     FE::core::insertRect(22.7150, 22.7155, 75.8500, 75.8505); // S3
+// int main()
+// {
 //
-//     FE::core::insertRect(22.7200, 22.7205, 75.8600, 75.8605); // S4
-//     FE::core::insertRect(22.7200, 22.7205, 75.8400, 75.8405); // S5
-//
-//     FE::core::insertRect(22.7300, 22.7305, 75.8700, 75.8705); // S6
-//     FE::core::insertRect(22.7000, 22.7005, 75.8300, 75.8305); // S7
-//
-//     FE::core::insertRect(22.7500, 22.7505, 75.9000, 75.9005); // S8
-//     FE::core::damageEvent(
-//         {0.005, 0.005},
-//         2000.0f,
-//         100.0f
+//     FE::core::insertStructure(
+//         26.2190, 26.2205,
+//         78.2220, 78.2240,
+//         3000.0,
+//         "struct_001",
+//         "player_owner"
 //     );
-//     FE::core::damageEvent(
-//         {22.7198, 75.8502},
-//         100.0f,
-//         100.0f
-//     );
-//     std::cout << "Test 2: " << count << '\n';
-//     FE::core::damageEvent(
-//         {22.7198, 75.8502},
-//         1000.0f,
-//         100.0f
-//     );
+
+//     motus::Position nearPos = { 26.2195, 78.2230 };
+//     float searchRadiusMeters = 100.0; // 500 meters
 //
-//     std::cout << "North/South test: " << count << '\n';
+//     bool isInsideA = FE::core::isWithinBB(nearPos, searchRadiusMeters);
+//     std::cout << "Test A (Near position, 500m radius): "
+//               << (isInsideA ? "PASS (Found)" : "FAIL (Not found)") << std::endl;
 //
-//     std::cout << "Structures hit: " << count << '\n';
+//     motus::Position farPos = { 28.6139, 77.2090 }; // New Delhi coordinates
+//
+//     bool isInsideB = FE::core::isWithinBB(farPos, searchRadiusMeters);
+//     std::cout << "Test B (Far position, 500m radius): "
+//               << (!isInsideB ? "PASS (Correctly outside)" : "FAIL (False positive)") << std::endl;
+//
 //     return 0;
 // }
