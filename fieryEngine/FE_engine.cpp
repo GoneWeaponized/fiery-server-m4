@@ -1,5 +1,5 @@
 #include "FE_engine.hpp"
-#include "./FEmodules/FE_core.hpp"
+#include "FEmodules/FE_core.hpp"
 #include "GeoOp.hpp"
 #include <atomic>
 #include <chrono>
@@ -14,7 +14,6 @@ using Geo = motus::GeoOp;
 using Position = motus::Position;
 
 std::chrono::seconds tickRate = std::chrono::seconds(1);
-// std::unordered_map<std::string, GObj*> movingMissile;
 std::atomic<bool> simulationRunning { true };
 std::mutex geoObjMutex;
 Geo geo;
@@ -26,7 +25,7 @@ std::string generate_random_string(std::size_t length)
     std::mt19937 generator(rd());
     std::uniform_int_distribution<> distribution(0, characters.size() - 1);
     std::string random_string;
-    random_string.reserve(length); // Optimize memory allocation
+    random_string.reserve(length);
 
     for (std::size_t i = 0; i < length; ++i) {
         random_string += characters[distribution(generator)];
@@ -36,7 +35,7 @@ std::string generate_random_string(std::size_t length)
 }
 
 void FE::engine::addMissile(std::string subId, double pos[], double dest[],
-    float speed)
+    float speed, short payload, short warhead)
 {
     GObj* newObj = new GObj;
     newObj->startPosition.lat = pos[0];
@@ -51,13 +50,10 @@ void FE::engine::addMissile(std::string subId, double pos[], double dest[],
     newObj->speed = speed;
     {
         std::lock_guard<std::mutex> lock(geoObjMutex);
-        std::cout << "LOCKED! FE::engine::addMissile\n";
-        // movingMissile.insert({subId, newObj});
-        FE::core::addMsl(HIGH_EXPLOSIVE, 500, newObj->speed, *newObj);
-        // adds a missile in missileMap
-        // the code might give a stroke to an AI model :skull:
+
+        FE::core::addMsl(
+            static_cast<warhead_type>(warhead), 500, newObj->speed, *newObj);
     }
-    std::cout << "ADDED MISSILE!\n";
 }
 
 void FE::engine::removeFromMap(std::string key)
@@ -71,6 +67,8 @@ void FE::engine::removeFromMap(std::string key)
         missileMap.erase(key);
     }
 }
+
+void FE::engine::stopEngine() { simulationRunning = false; }
 
 void FE::engine::startEngine()
 {
@@ -96,29 +94,5 @@ void FE::engine::startEngine()
         }
         std::this_thread::sleep_for(tickRate);
     }
-    std::cout << "\nall jobs done. No missiles in the map.\n";
-}
-int main()
-{
-    float hp = 10000.0f;
-    std::cout << "--- STARTING DUAL MISSILE BLAST TEST ---\n";
-    FE::core::insertStructure(
-        22.7495, 22.7505,
-        75.8995, 75.9005,
-        hp,
-        "STRUCT_TARGET_1",
-        "PLAYER_OWNER");
-
-    double startPos1[2] = { 22.7200, 75.8900 };
-    double targetDest1[2] = { 22.7500, 75.9000 };
-    FE::engine::addMissile("MISSILE_DIRECT", startPos1, targetDest1, 2000.0f);
-    double startPos2[2] = { 22.7200, 75.9200 };
-    double targetDest2[2] = { 22.7550, 75.9000 };
-    FE::engine::addMissile("MISSILE_BLAST", startPos2, targetDest2, 2000.0f);
-
-    std::cout << "Both missiles launched! Starting engine loop...\n\n";
-
-    FE::engine::startEngine();
-
-    return 0;
+    std::cout << "\n ==== ENGINE STOPPING ==== \n";
 }

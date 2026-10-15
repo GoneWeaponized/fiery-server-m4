@@ -153,9 +153,12 @@ function addBuilding(building, buildable) {
 //         return true;
 //     }
 // }
-
+function updateStructure(SubId, HP) {
+    const str = structures.find(it => it.data.subId === SubId);
+    str.data.hp = HP;
+}
 function placementValidate(lat, long) {
-    const rad = 0.001; //100m
+    const rad = 100.0;
     const result = FE.isInBB(lat, long, rad);
     if (result) {
         console.log("Yep. its close.");
@@ -221,24 +224,18 @@ function sendStructures(socket) {
 
     }
 }
+
 for (const structure of structures) {
-    if(FE.addStr(structure.data.subId, structure.owner, structure.data.hp,structure.position.lat, structure.position.lat, structure.position.long, structure.position.long)) {
-        console.log("Added a new strucutre");
-    }
+    FE.addStr(structure.data.subId, structure.owner, structure.data.hp,structure.position.lat, structure.position.lat, structure.position.long, structure.position.long);
 }
-const a = new Float64Array([52.8040198, -7.1228063]);
-const b = new Float64Array([52.8040198, -2.1228063]);
-if (FE.addMissile("5abd",a,b, 30000.0)) {
-    console.log("Added a missile!");
-}
-FE.startEngine();
 console.log("\n\n\nEngine started in background. Watching simulation...\n\n\n");
 module.exports = {
     addBuilding,
     construct,
     saveStructures,
     sendStructures,
-    removeStructure
+    removeStructure,
+    updateStructure
 };
 
 // A structure inventory file will be created separately for structures that do have an inventory.

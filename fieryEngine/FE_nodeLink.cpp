@@ -8,6 +8,28 @@
 
 std::mutex mtx;
 std::thread* engineThread = nullptr;
+Napi::ThreadSafeFunction updateStructureCallback;
+
+Napi::Value getStructures(const Napi::CallbackInfo& info)
+{
+    Napi::Env env = info.Env();
+    uint32_t index = 0;
+    Napi::Array structuresUpdatedArray = Napi::Array::New(env);
+    std::lock_guard<std::mutex> lock(mtx);
+    for (auto& it : mapStructures) {
+        Napi::Object structureItem = Napi::Object::New(env);
+
+        structureItem.Set(Napi::String::New(env, "id"), Napi::String::New(env, it.second->subId));
+        structureItem.Set(Napi::String::New(env, "hp"), Napi::Number::New(env, it.second->HP));
+        // structureItem.Set(Napi::String::New(env, "latmin"), Napi::Number::New(env, it.second->min[0]));
+        // structureItem.Set(Napi::String::New(env, "latmax"), Napi::Number::New(env, it.second->max[0]));
+        // structureItem.Set(Napi::String::New(env, "longMin"), Napi::Number::New(env, it.second->min[1]));
+        // structureItem.Set(Napi::String::New(env, "longMax"), Napi::Number::New(env, it.second->max[1]));
+        structuresUpdatedArray.Set(index++, structureItem);
+    }
+    mtx.unlock();
+    return structuresUpdatedArray;
+}
 Napi::Value getMissile(const Napi::CallbackInfo& info)
 {
     Napi::Env env = info.Env();
@@ -28,7 +50,7 @@ Napi::Value getMissile(const Napi::CallbackInfo& info)
     mtx.unlock();
     return missileJSObjectArray;
 }
-Napi::Boolean addMissile(const Napi::CallbackInfo& inf)
+Napi::Boolean addMissile(const Napi::CallbackInfo& inf) // bro, it takes String: ID, DoubleArray: [latMin, latMax], DoubleArray: [longMin, longMax], Float: speed
 {
     Napi::Env env = inf.Env();
     if (inf.Length() < 4) {
@@ -47,8 +69,10 @@ Napi::Boolean addMissile(const Napi::CallbackInfo& inf)
     Napi::Number spd = inf[3].As<Napi::Number>();
     double p[2] = { parr[0], parr[1] };
     double d[2] = { darr[0], darr[1] };
+    Napi::Number warhead = inf[4].As<Napi::Number>();
+    Napi::Number payload = inf[5].As<Napi::Number>();
     try {
-        FE::engine::addMissile(id, p, d, spd);
+        FE::engine::addMissile(id, p, d, spd, (int)payload, (int)warhead);
     } catch (std::exception& e) {
         std::cerr << e.what();
         return Napi::Boolean::New(env, false);
@@ -68,7 +92,7 @@ Napi::Boolean startTicking(const Napi::CallbackInfo& inf)
     }
     return Napi::Boolean::New(env, true);
 }
-Napi::Boolean getDistanceFromStructure(const Napi::CallbackInfo& info)
+Napi::Boolean getDistanceFromStructure(const Napi::CallbackInfo& info) // takes Position p and searches in the RTree for a structure then checks for the distance between location and structure
 {
     Napi::Env env = info.Env();
     motus::Position p = { info[0].As<Napi::Number>(), info[1].As<Napi::Number>() };
@@ -103,6 +127,7 @@ Napi::Object Init(Napi::Env env, Napi::Object exports)
         Napi::Function::New(env, addStuctureCpp));
     exports.Set(Napi::String::New(env, "isInBB"), Napi::Function::New(env, getDistanceFromStructure));
     exports.Set(Napi::String::New(env, "getMissile"), Napi::Function::New(env, getMissile));
+    exports.Set(Napi::String::New(env, "getStructures"), Napi::Function::New(env, getStructures));
     return exports;
 }
 

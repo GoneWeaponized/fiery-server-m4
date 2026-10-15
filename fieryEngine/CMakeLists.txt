@@ -7,5 +7,6 @@ include_directories(.)
 
 add_library(${CMAKE_PROJECT_NAME} SHARED
         GeoOp.hpp
-        test.cpp
+        FE_engine.cpp
+        ./FEmodules/FE_core.cpp
 )
